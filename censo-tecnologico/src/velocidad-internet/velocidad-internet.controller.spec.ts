@@ -9,7 +9,9 @@ describe('VelocidadInternetController', () => {
       controllers: [VelocidadInternetController],
     }).compile();
 
-    controller = module.get<VelocidadInternetController>(VelocidadInternetController);
+    controller = module.get<VelocidadInternetController>(
+      VelocidadInternetController,
+    );
   });
 
   it('should be defined', () => {

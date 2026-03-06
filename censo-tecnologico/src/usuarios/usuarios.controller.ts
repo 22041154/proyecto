@@ -1,4 +1,14 @@
-import { Controller, Post, Body, BadRequestException, Get, Param, UseGuards, Patch, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  Get,
+  Param,
+  UseGuards,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/auth/admin.guard';
@@ -8,9 +18,13 @@ export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post('registro')
-  async registrar(@Body() body: { usuario: string; contrasena: string; role?: string }) {
+  async registrar(
+    @Body() body: { usuario: string; contrasena: string; role?: string },
+  ) {
     if (!body.usuario || !body.contrasena) {
-      throw new BadRequestException('Faltan datos: usuario y contrasena son requeridos');
+      throw new BadRequestException(
+        'Faltan datos: usuario y contrasena son requeridos',
+      );
     }
 
     const existe = await this.usuariosService.encontrarPorNombre(body.usuario);
@@ -18,8 +32,12 @@ export class UsuariosController {
       throw new BadRequestException('El usuario ya existe');
     }
 
-    const created = await this.usuariosService.crear(body.usuario, body.contrasena, body.role);
-    
+    const created = await this.usuariosService.crear(
+      body.usuario,
+      body.contrasena,
+      body.role,
+    );
+
     return this.usuariosService.findOneById(created.id);
   }
 
@@ -51,7 +69,7 @@ export class UsuariosController {
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Patch(':id/role')
   async setRole(@Param('id') id: string, @Body() body: { role: string }) {
-    if (!body.role) throw new BadRequestException('rol is required');
-    return this.usuariosService.update(+id, { rol: body.role } as any);
+    if (!body.role) throw new BadRequestException('role is required');
+    return this.usuariosService.update(+id, { role: body.role } as any);
   }
 }

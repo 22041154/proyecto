@@ -14,7 +14,7 @@ export class AdminUsuariosComponent implements OnInit {
   private censoService = inject(CensoApiService);
 
   usuarios: any[] = [];
-  nuevoUsuario = { usuario: '', contrasena: '', rol: 'user' };
+  nuevoUsuario = { usuario: '', contrasena: '', role: 'user' };
   cargando = false;
 
   ngOnInit() {
@@ -42,8 +42,8 @@ export class AdminUsuariosComponent implements OnInit {
 
     this.censoService.registrarUsuario(this.nuevoUsuario).subscribe({
     next: () => {
-      alert(`Usuario ${this.nuevoUsuario.usuario} creado como ${this.nuevoUsuario.rol}`);
-      this.nuevoUsuario = { usuario: '', contrasena: '', rol: 'user' };
+      alert(`Usuario ${this.nuevoUsuario.usuario} creado como ${this.nuevoUsuario.role}`);
+      this.nuevoUsuario = { usuario: '', contrasena: '', role: 'user' };
       this.obtenerUsuarios();
     },
     error: (e) => alert('Error al registrar')

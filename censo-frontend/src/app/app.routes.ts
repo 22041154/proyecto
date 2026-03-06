@@ -20,8 +20,7 @@ export const routes: Routes = [
   { path: 'conectividad', component: Conectividad },
   { path: 'servicios', component: ServiciosComponent },
   { path: 'resumen', component: Resumen },
-  { path: 'admin/usuarios', component: AdminUsuariosComponent, canActivate: [AdminGuard] },
-
+  { path: 'admin-usuarios', component: AdminUsuariosComponent, canActivate: [AdminGuard] },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }
 ];

@@ -14,8 +14,8 @@
           <input type="password" class="form-control" placeholder="Contraseña" [(ngModel)]="nuevoUsuario.contrasena">
         </div>
         <div class="col-md-2">
-          <label class="form-label small fw-bold">Rol:</label>
-          <select class="form-select" [(ngModel)]="nuevoUsuario.rol">
+          <label class="form-label small fw-bold">Role:</label>
+          <select class="form-select" [(ngModel)]="nuevoUsuario.role">
             <option value="user">Usuario</option>
             <option value="admin">Administrador</option>
           </select>
@@ -34,7 +34,7 @@
             <tr>
               <th>ID</th>
               <th>Usuario</th>
-              <th>Rol</th>
+              <th>Role</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -42,7 +42,7 @@
             <tr *ngFor="let u of usuarios">
               <td>{{ u.idusuario }}</td>
               <td>{{ u.usuario }}</td>
-              <td><span class="badge" [ngClass]="u.rol === 'admin' ? 'bg-danger' : 'bg-info'">{{ u.rol }}</span></td>
+              <td><span class="badge" [ngClass]="u.role === 'admin' ? 'bg-danger' : 'bg-info'">{{ u.role }}</span></td>
               <td>
                 <button class="btn btn-sm btn-outline-danger" (click)="eliminar(u.idusuario)">
                   <i class="bi bi-trash"></i> Eliminar

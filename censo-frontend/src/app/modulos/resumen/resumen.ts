@@ -19,12 +19,10 @@ export class Resumen implements OnInit {
   cargando = true;
   fechaImpresion = new Date();
   
-  // Control de modo edición global
   modoEdicion = false;
   guardando = false;
   mensajeExito = '';
 
-  // Catálogos para Sección 3
   catalogos = {
     medios: [] as any[],
     velocidades: [] as any[]
@@ -146,7 +144,6 @@ export class Resumen implements OnInit {
       tiene_servidores: this.datos.tiene_servidores,
       cantidad_servidores: this.datos.cantidad_servidores,
       tiene_wifi_publico: this.datos.tiene_wifi_publico,
-      // Enviar medios y velocidades seleccionados
       mediosConexionSeleccionados: this.catalogos.medios
         .filter(m => this.mediosSeleccionados[m.id])
         .map(m => ({ id: m.id, medio: m.medio })),
@@ -165,7 +162,6 @@ export class Resumen implements OnInit {
       this.censoService.obtenerDatosEscuela(+id).subscribe({
         next: (res: any) => { 
           this.datos = res;
-          // Reinicializar selecciones después de cargar nuevos datos
           this.mediosSeleccionados = {};
           this.velocidadesSeleccionadas = {};
           this.inicializarSelecciones();

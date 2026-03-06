@@ -6,7 +6,6 @@ import { GeneralResponse } from '../POCOS/DTO/responses/general-response.dto';
 @ApiTags('Tipos de Computadora')
 @Controller('tipos-computadora')
 export class TiposComputadoraController {
-
   constructor(private service: TiposComputadoraService) {}
 
   @Get()
@@ -17,8 +16,8 @@ export class TiposComputadoraController {
     const respuesta: GeneralResponse = {
       data: {
         type: 'tipos-computadora',
-        attributes: { mensaje: 'Lista cargada', contenido: lista }
-      }
+        attributes: { mensaje: 'Lista cargada', contenido: lista },
+      },
     };
     return response.status(HttpStatus.OK).json(respuesta);
   }
@@ -30,8 +29,8 @@ export class TiposComputadoraController {
     const respuesta: GeneralResponse = {
       data: {
         type: 'tipos-computadora',
-        attributes: { mensaje: 'Creado exitosamente', contenido: nuevo }
-      }
+        attributes: { mensaje: 'Creado exitosamente', contenido: nuevo },
+      },
     };
     return response.status(HttpStatus.CREATED).json(respuesta);
   }

@@ -13,7 +13,7 @@ import { AdminGuard } from './admin.guard';
     PassportModule,
     JwtModule.register({
       secret: 'CLAVE_SECRETA_PARA_FIRMAR_TOKENS', 
-      signOptions: { expiresIn: '10min' }, 
+      signOptions: { expiresIn: '1h' }, 
     }),
   ],
   providers: [AuthService, JwtStrategy, AdminGuard],

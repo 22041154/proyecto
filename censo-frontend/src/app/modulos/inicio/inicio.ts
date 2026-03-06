@@ -32,7 +32,7 @@ export class Inicio implements OnInit {
   departamentos: string[] = [];
 
   ngOnInit() {
-    this.verificarRol(); // Comprobar si es admin para el botón del CMS
+    this.verificarRole(); // Comprobar si es admin para el botón del CMS
     this.cargarDepartamentosDisponibles();
     this.verificarProgreso();
     
@@ -46,21 +46,19 @@ export class Inicio implements OnInit {
     }
   }
 
-  verificarRol() {
-  const rol = this.authService.obtenerRol();
-  console.log('Rol detectado:', rol);
-  this.esAdmin = (rol === 'admin');
+  verificarRole() {
+  const role = this.authService.obtenerRole();
+  console.log('Role detectado:', role);
+  this.esAdmin = (role === 'admin');
 }
 
   cargarDepartamentosDisponibles() {
   this.censoService.obtenerDepartamentosDisponibles().subscribe({
     next: (departamentos) => {
-      // Si el backend ya envía la lista nueva, la usamos
       this.departamentos = departamentos;
     },
     error: (err) => {
       console.error('Error obteniendo departamentos disponibles', err);
-      // Nueva lista actualizada según tu requerimiento
       this.departamentos = [
         '-- Departamentos Académicos --',
         'Sistemas y Computación',

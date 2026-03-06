@@ -31,7 +31,13 @@ export class LoginComponent {
     this.authService.login(this.credenciales.usuario, this.credenciales.contrasena)
       .subscribe({
         next: () => {
-          this.router.navigate(['/inicio']); 
+          const role = this.authService.getUserRole();
+          
+          if (role === 'admin') {
+            this.router.navigate(['/admin-usuarios']); 
+          } else {
+            this.router.navigate(['/inicio']); 
+          }
         },
         error: (err) => {
           this.cargando = false;

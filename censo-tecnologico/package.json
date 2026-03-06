@@ -22,7 +22,7 @@
     "reset-admin-pass": "ts-node -r tsconfig-paths/register src/scripts/set-admin-pass.ts"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
+    "@nestjs/common": "^11.1.16",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.1",

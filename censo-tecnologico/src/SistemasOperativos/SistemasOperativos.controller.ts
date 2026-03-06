@@ -6,7 +6,6 @@ import { GeneralResponse } from '../POCOS/DTO/responses/general-response.dto';
 @ApiTags('Sistemas Operativos')
 @Controller('SistemasOperativos')
 export class SistemasOperativosController {
-
   constructor(private service: SistemasOperativosService) {}
 
   @Get()
@@ -17,8 +16,8 @@ export class SistemasOperativosController {
     const respuesta: GeneralResponse = {
       data: {
         type: 'sistemas-operativos',
-        attributes: { mensaje: 'Lista cargada', contenido: lista }
-      }
+        attributes: { mensaje: 'Lista cargada', contenido: lista },
+      },
     };
     return response.status(HttpStatus.OK).json(respuesta);
   }
@@ -31,8 +30,8 @@ export class SistemasOperativosController {
     const respuesta: GeneralResponse = {
       data: {
         type: 'sistemas-operativos',
-        attributes: { mensaje: 'Creado exitosamente', contenido: nuevo }
-      }
+        attributes: { mensaje: 'Creado exitosamente', contenido: nuevo },
+      },
     };
     return response.status(HttpStatus.CREATED).json(respuesta);
   }

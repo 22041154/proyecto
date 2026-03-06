@@ -45,25 +45,20 @@ export class AuthService {
     }
   }
 
-  /**
-   * Obtiene el rol del usuario desde el token.
-   * IMPORTANTE: Debe buscar 'rol' (en español) para coincidir con el Backend.
-   */
   getUserRole(): string | null {
     const token = localStorage.getItem('token');
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       console.log('Payload del token:', payload); // Útil para depurar en F12
-      return payload.rol || null; 
+      return payload.role || null; 
     } catch (e) {
       console.error('Error decodificando token:', e);
       return null;
     }
   }
 
-  // Método alias para mantener compatibilidad con el componente de Inicio
-  obtenerRol(): string | null {
+  obtenerRole(): string | null {
     return this.getUserRole();
   }
 

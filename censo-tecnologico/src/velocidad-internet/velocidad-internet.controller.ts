@@ -16,8 +16,8 @@ export class VelocidadInternetController {
     const respuesta: GeneralResponse = {
       data: {
         type: 'velocidad-internet',
-        attributes: { mensaje: 'Lista cargada', contenido: lista }
-      }
+        attributes: { mensaje: 'Lista cargada', contenido: lista },
+      },
     };
     return response.status(HttpStatus.OK).json(respuesta);
   }

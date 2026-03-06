@@ -9,7 +9,9 @@ describe('TiposComputadorasController', () => {
       controllers: [TiposComputadorasController],
     }).compile();
 
-    controller = module.get<TiposComputadorasController>(TiposComputadorasController);
+    controller = module.get<TiposComputadorasController>(
+      TiposComputadorasController,
+    );
   });
 
   it('should be defined', () => {
