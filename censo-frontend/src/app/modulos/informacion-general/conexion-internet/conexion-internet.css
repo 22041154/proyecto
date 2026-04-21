@@ -1,6 +1,9 @@
 /* Título Azul (#1F3564) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
-
+.container.mt-4 {
+  margin-top: 100px !important; 
+  position: relative;
+}
 .descripcion-inter {
   font-family: 'Inter', sans-serif;
   color: #6c757d;   

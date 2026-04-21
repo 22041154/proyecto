@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
+.container.mt-4 {
+  margin-top: 100px !important; 
+  position: relative;
+}
 /* Títulos Azules */
 .titulo-azul {
   color: #1F3564;

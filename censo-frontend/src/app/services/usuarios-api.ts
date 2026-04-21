@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class UsuariosApiService {
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl || 'http://localhost:3000';
+  private baseUrl = environment.apiUrl || 'http://localhost:5203';
 
   list(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/usuarios`);

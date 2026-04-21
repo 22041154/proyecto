@@ -11,14 +11,14 @@ import { Observable } from 'rxjs';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private baseUrl = environment.apiUrl || 'http://localhost:3000';
+  private baseUrl = environment.apiUrl || 'http://localhost:5203';
 
   login(usuario: string, contrasena: string): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/auth/login`, { usuario, contrasena })
       .pipe(
         tap(response => {
           if (response.access_token) {
-            // Almacenamos el token para sesiones futuras
+            
             localStorage.setItem('token', response.access_token);
           }
         })
@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   logout() {
-    // Limpiamos los datos locales para cerrar la sesión por completo
+    
     localStorage.removeItem('token');
     localStorage.removeItem('id_censo_actual'); 
     localStorage.removeItem('temp_departamento');

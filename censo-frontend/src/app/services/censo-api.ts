@@ -10,7 +10,7 @@ import id from '@angular/common/locales/extra/id';
 })
 export class CensoApiService {
 
-  private baseUrl = environment.apiUrl || 'http://localhost:3000';
+  private baseUrl = environment.apiUrl || 'http://localhost:5203';
   private http = inject(HttpClient);
 
   constructor() { }

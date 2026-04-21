@@ -16,8 +16,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  await app.listen(3000);
-  console.log(` Servidor corriendo en: http://localhost:3000`);
-  console.log(` Swagger disponible en: http://localhost:3000/swagger`);
+  await app.listen(5203);
+  console.log(` Servidor corriendo en: http://localhost:5203`);
+  console.log(` Swagger disponible en: http://localhost:5203/swagger`);
 }
 bootstrap();
