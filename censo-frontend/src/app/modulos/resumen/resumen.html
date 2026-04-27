@@ -1,322 +1,232 @@
-<div class="container my-5" *ngIf="datos; else loading">
-
-  <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-    <h2 class="titulo-azul">Vista Previa del Reporte Final</h2>
-    <div>
-      <button class="btn btn-outline-secondary me-3" (click)="imprimir()" [disabled]="modoEdicion">
-        <i class="bi bi-printer"></i> Imprimir / PDF
-      </button>
-      <button *ngIf="!modoEdicion" class="btn btn-outline-primary me-3" (click)="activarEdicionGlobal()">
-        <i class="bi bi-pencil"></i> Editar Reporte
-      </button>
-      <div *ngIf="modoEdicion" class="btn-group me-3" role="group">
-        <button class="btn btn-success" (click)="guardarSeccion()" [disabled]="guardando">
-          <i class="bi bi-check-lg"></i> Guardar
-        </button>
-        <button class="btn btn-secondary" (click)="cancelarEdicion()" [disabled]="guardando">
-          <i class="bi bi-x-lg"></i> Cancelar
-        </button>
-      </div>
-      <button class="btn btn-azul-inst" (click)="finalizar()" [disabled]="modoEdicion">
-        <i class="bi bi-check-circle-fill"></i> Finalizar y Cerrar
-      </button>
-    </div>
-  </div>
-
-  <div class="alert alert-success alert-dismissible fade show" role="alert" *ngIf="mensajeExito">
-    {{ mensajeExito }}
-  </div>
-
-  <div class="card shadow-lg border-0 print-section" id="hoja-reporte">
-    <div class="card-body p-5">
-      
-      <div class="row border-bottom pb-3 mb-4 align-items-center">
-        <div class="col-9">
-          <h3 class="fw-bold text-uppercase mb-1" style="color: #1F3564;">Censo Tecnológico 2026</h3>
-          <h5 class="text-secondary fw-light">Reporte Integral de Infraestructura Tecnológica</h5>
-          <p class="mb-0 small text-muted mt-2">
-            <strong>Folio de Registro:</strong> {{ datos.iddatos }} &nbsp;|&nbsp; 
-            <strong>Emisión:</strong> {{ fechaImpresion | date:'dd/MM/yyyy HH:mm' }}
-          </p>
-          <p class="mb-0 small text-muted mt-2" *ngIf="datos.departamento">
-            <strong>Departamento:</strong> {{ datos.departamento }}
-          </p>
-        </div>
-        <div class="col-3 text-end">
-          <img src="https://i.postimg.cc/kX4cYgnm/logo.png" alt="Logo Institucional" class="img-fluid" style="max-height: 100px;">
-        </div>
-      </div>
-
-      <!-- SECCIÓN 1: Inventario Físico General -->
-      <h5 class="titulo-seccion mb-3">1. Inventario Físico General</h5>
-
-      <div class="row mb-4 g-2" *ngIf="!modoEdicion">
-        <div class="col-md-3">
-          <div class="p-2 border rounded" style="border-color: #ddd;">
-            <p class="text-muted mb-1" style="font-size: 0.75rem;">EN OPERACIÓN</p>
-            <h5 class="mb-0" style="color: #333; font-size: 1.5rem;">{{ datos.operativas }}</h5>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="p-2 border rounded" style="border-color: #ddd;">
-            <p class="text-muted mb-1" style="font-size: 0.75rem;">EN REPARACIÓN</p>
-            <h5 class="mb-0" style="color: #333; font-size: 1.5rem;">{{ datos.reparacion }}</h5>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="p-2 border rounded" style="border-color: #ddd;">
-            <p class="text-muted mb-1" style="font-size: 0.75rem;">EN RESERVA</p>
-            <h5 class="mb-0" style="color: #333; font-size: 1.5rem;">{{ datos.reserva }}</h5>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="p-2 border rounded" style="border-color: #ddd; border-width: 2px;">
-            <p class="text-muted mb-1" style="font-size: 0.75rem;">TOTAL EQUIPOS</p>
-            <h5 class="mb-0" style="color: #333; font-size: 1.5rem;"><strong>{{ (datos.operativas || 0) + (datos.reparacion || 0) + (datos.reserva || 0) }}</strong></h5>
-          </div>
-        </div>
-      </div>
-
-      <!-- FORMULARIO DE EDICIÓN - Inventario Físico -->
-      <div class="row mb-4" *ngIf="modoEdicion">
-        <div class="col-md-3 mb-3">
-          <label class="form-label fw-bold">En Operación</label>
-          <input type="number" class="form-control" [(ngModel)]="datos.operativas" placeholder="0">
-        </div>
-        <div class="col-md-3 mb-3">
-          <label class="form-label fw-bold">En Reparación</label>
-          <input type="number" class="form-control" [(ngModel)]="datos.reparacion" placeholder="0">
-        </div>
-        <div class="col-md-3 mb-3">
-          <label class="form-label fw-bold">En Reserva</label>
-          <input type="number" class="form-control" [(ngModel)]="datos.reserva" placeholder="0">
-        </div>
-        <div class="col-md-3 mb-3">
-          <label class="form-label fw-bold">Total</label>
-          <input type="number" class="form-control bg-light" 
-                 [value]="(datos.operativas || 0) + (datos.reparacion || 0) + (datos.reserva || 0)" disabled>
-        </div>
-      </div>
-
-      <!-- SECCIÓN 2: Clasificación por Uso -->
-      <h5 class="titulo-seccion mb-3">2. Clasificación por Uso y Conectividad</h5>
-
-      <div *ngIf="!modoEdicion">
-        <table class="table table-bordered table-sm mb-4">
-          <thead style="background-color: #f8f9fa; border-bottom: 2px solid #1F3564;">
-            <tr class="text-center">
-              <th style="color: #1F3564; font-weight: 600;">Categoría de Uso</th>
-              <th style="color: #1F3564; font-weight: 600;">Equipos Totales</th>
-              <th style="color: #1F3564; font-weight: 600;">Con Acceso a Red</th>
-              <th style="color: #1F3564; font-weight: 600;">Sin Acceso a Red</th>
-            </tr>
-          </thead>
-          <tbody class="text-center">
-            <tr>
-              <td class="text-start ps-3 fw-bold">Educativo / Laboratorios</td>
-              <td>{{ datos.uso_educativo }}</td>
-              <td>{{ datos.internet_educativo }}</td>
-              <td>{{ (datos.uso_educativo || 0) - (datos.internet_educativo || 0) }}</td>
-            </tr>
-            <tr>
-              <td class="text-start ps-3 fw-bold">Docente</td>
-              <td>{{ datos.uso_docente }}</td>
-              <td>{{ datos.internet_docente }}</td>
-              <td>{{ (datos.uso_docente || 0) - (datos.internet_docente || 0) }}</td>
-            </tr>
-            <tr>
-              <td class="text-start ps-3 fw-bold">Administrativo</td>
-              <td>{{ datos.uso_administrativo }}</td>
-              <td>{{ datos.internet_administrativo }}</td>
-              <td>{{ (datos.uso_administrativo || 0) - (datos.internet_administrativo || 0) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- FORMULARIO DE EDICIÓN - Clasificación por Uso -->
-      <div class="table-responsive" *ngIf="modoEdicion">
-        <table class="table table-bordered table-sm">
-          <thead class="bg-light">
-            <tr>
-              <th>Categoría</th>
-              <th>Equipos Totales</th>
-              <th>Con Acceso a Red</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="fw-bold">Educativo / Laboratorios</td>
-              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="datos.uso_educativo"></td>
-              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="datos.internet_educativo"></td>
-            </tr>
-            <tr>
-              <td class="fw-bold">Docente</td>
-              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="datos.uso_docente"></td>
-              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="datos.internet_docente"></td>
-            </tr>
-            <tr>
-              <td class="fw-bold">Administrativo</td>
-              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="datos.uso_administrativo"></td>
-              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="datos.internet_administrativo"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- SECCIÓN 3: Conectividad e Infraestructura de Red -->
-      <h5 class="titulo-seccion mb-3" style="margin-top: 2rem;">3. Conectividad e Infraestructura de Red</h5>
-
-      <div class="row mb-4" *ngIf="!modoEdicion">
-        <div class="col-md-6">
-          <p class="mb-1"><strong>Medio(s) de Conexión:</strong></p>
-          <div class="mb-3">
-            <span *ngFor="let m of datos.mediosConexionSeleccionados" class="badge border" style="background-color: #f8f9fa; color: #333; border-color: #ddd !important;">{{ m.medio }}</span>
-            <span *ngIf="!datos.mediosConexionSeleccionados?.length" class="text-muted small">No especificado</span>
-          </div>
-          <p class="mb-1"><strong>Rangos de Velocidad:</strong></p>
-          <div>
-            <span *ngFor="let v of datos.velocidadesInternetSeleccionadas" class="badge border" style="background-color: #f8f9fa; color: #333; border-color: #ddd !important;">{{ v.rango }}</span>
-            <span *ngIf="!datos.velocidadesInternetSeleccionadas?.length" class="text-muted small">No especificado</span>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <table class="table table-sm table-bordered">
-            <thead class="bg-light">
-              <tr><th colspan="2" class="text-center small">Origen de Equipamiento (Adquisición)</th></tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let a of datos.conteosAdquisicion">
-                <td class="small">{{ a.tipoAdquisicion?.tipo }}</td>
-                <td class="text-center fw-bold small">{{ a.cantidad }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- FORMULARIO DE EDICIÓN - Conectividad -->
-      <div class="row" *ngIf="modoEdicion">
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-bold">Medio(s) de Conexión</label>
-          <div class="border rounded p-3 bg-light">
-            <div *ngFor="let medio of catalogos.medios" class="form-check">
-              <input class="form-check-input" type="checkbox" [(ngModel)]="mediosSeleccionados[medio.id]" [id]="'medio_' + medio.id">
-              <label class="form-check-label" [for]="'medio_' + medio.id">
-                {{ medio.medio }}
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-bold">Rangos de Velocidad de Internet</label>
-          <div class="border rounded p-3 bg-light">
-            <div *ngFor="let velocidad of catalogos.velocidades" class="form-check">
-              <input class="form-check-input" type="checkbox" [(ngModel)]="velocidadesSeleccionadas[velocidad.id]" [id]="'velocidad_' + velocidad.id">
-              <label class="form-check-label" [for]="'velocidad_' + velocidad.id">
-                {{ velocidad.rango }}
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECCIÓN 4: Servicios Complementarios -->
-      <h5 class="titulo-seccion mb-3">4. Servicios Complementarios</h5>
-
-      <div class="row mb-5" *ngIf="!modoEdicion">
-        <div class="col-12">
-          <ul class="list-group list-group-flush border rounded">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span><strong>Servicio de Impresión:</strong> {{ datos.tiene_impresora_estudiantes ? 'Disponible para estudiantes' : 'No disponible' }}</span>
-              <span *ngIf="datos.tiene_impresora_estudiantes" class="badge border" [ngClass]="datos.impresiones_gratuitas ? 'bg-light text-dark' : 'bg-light text-dark'" style="border-color: #ddd !important;">
-                {{ datos.impresiones_gratuitas ? 'Gratuito' : 'Con Costo' }}
-              </span>
-            </li>
-            <li class="list-group-item">
-              <strong>Servidores Propios:</strong> {{ datos.tiene_servidores ? 'La institución cuenta con ' + datos.cantidad_servidores + ' servidor(es)' : 'No cuenta con servidores propios' }}
-            </li>
-            <li class="list-group-item">
-              <strong>Wi-Fi Público:</strong> {{ datos.tiene_wifi_publico ? 'Disponible en áreas comunes' : 'No disponible' }}
-              <div *ngIf="datos.tiene_wifi_publico" class="mt-2 small">
-                Acceso autorizado para: <span *ngFor="let p of datos.perfilesWifiSeleccionados" class="fw-bold me-2">• {{ p.perfil }}</span>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- FORMULARIO DE EDICIÓN - Servicios -->
-      <div class="row" *ngIf="modoEdicion">
-        <div class="col-12 mb-3">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" [(ngModel)]="datos.tiene_impresora_estudiantes" id="impresoras">
-            <label class="form-check-label" for="impresoras">
-              Servicio de Impresión Disponible para Estudiantes
-            </label>
-          </div>
-          <div *ngIf="datos.tiene_impresora_estudiantes" class="ms-4 mt-2">
-            <div class="form-check">
-              <input class="form-check-input" type="radio" [(ngModel)]="datos.impresiones_gratuitas" [value]="true" id="gratuitas" name="impresiones">
-              <label class="form-check-label" for="gratuitas">Gratuito</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" [(ngModel)]="datos.impresiones_gratuitas" [value]="false" id="pago" name="impresiones">
-              <label class="form-check-label" for="pago">Con Costo</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 mb-3">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" [(ngModel)]="datos.tiene_servidores" id="servidores">
-            <label class="form-check-label" for="servidores">
-              La institución cuenta con servidores propios
-            </label>
-          </div>
-          <div *ngIf="datos.tiene_servidores" class="ms-4 mt-2">
-            <label class="form-label">Cantidad de Servidores:</label>
-            <input type="number" class="form-control" [(ngModel)]="datos.cantidad_servidores" placeholder="0">
-          </div>
-        </div>
-
-        <div class="col-12">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" [(ngModel)]="datos.tiene_wifi_publico" id="wifi">
-            <label class="form-check-label" for="wifi">
-              Wi-Fi Público Disponible
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="row mt-5 pt-4 firmas-container text-center">
-        <div class="col-6">
-          <div class="border-top border-dark w-75 mx-auto pt-2"></div>
-          <p class="fw-bold mb-0">Firma del Responsable</p>
-          <small class="text-muted small">Nombre, Firma y Cargo</small>
-        </div>
-        <div class="col-6">
-          <div class="border-top border-dark w-75 mx-auto pt-2"></div>
-          <p class="fw-bold mb-0">Sello de la Institución</p>
-          <small class="text-muted small">Unidad Académica / Departamento</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-footer bg-white border-0 text-center text-muted small pb-4">
-      <hr>
-      Sistema de Censo Tecnológico | Generado el {{ fechaImpresion | date:'dd/MM/yyyy HH:mm' }}
-    </div>
+<div class="container mt-4 mb-5" *ngIf="cargando">
+  <div class="text-center">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2">Cargando reporte de inventario...</p>
   </div>
 </div>
 
-<ng-template #loading>
-  <div class="container text-center my-5 py-5">
-    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
-    <p class="text-muted mt-3 fw-bold">Generando reporte integral...</p>
+<div class="container mt-4 mb-5" *ngIf="!cargando && datos">
+  
+  <div class="alert alert-success text-center fw-bold" *ngIf="mensajeExito">
+    {{ mensajeExito }}
   </div>
-</ng-template>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+    <div>
+      <h2 class="mb-0 text-dark fw-bold" style="color: #1a237e !important;">REPORTE DE INVENTARIO</h2>
+      <p class="text-muted mb-0 mt-1">Resumen detallado de los datos recabados. (Depto: <strong>{{ datos.departamento?.nombre }}</strong>)</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary" *ngIf="!modoEdicion" (click)="activarEdicionGlobal()">Editar Datos</button>
+      <button class="btn btn-outline-secondary" *ngIf="!modoEdicion" (click)="imprimir()">Imprimir Reporte</button>
+      <button class="btn btn-secondary" *ngIf="modoEdicion" (click)="cancelarEdicion()" [disabled]="guardando">Cancelar</button>
+      <button class="btn btn-success" *ngIf="modoEdicion" (click)="guardarSeccion()" [disabled]="guardando">Guardar</button>
+    </div>
+  </div>
+
+  <div class="d-none d-print-block mb-4 text-center">
+    <h3 class="text-uppercase fw-bold">Instituto Tecnológico de Durango</h3>
+    <h4>Reporte de Infraestructura y Equipamiento de Cómputo (Estadisticatic)</h4>
+    <p class="fs-6"><strong>Departamento Analizado:</strong> {{ datos.departamento?.nombre }}</p>
+    <hr>
+  </div>
+
+  <div class="table-responsive bg-white border border-dark">
+    <table class="table table-bordered align-middle table-hover mb-0" style="background-color: #fff;">
+      <thead class="bg-light text-center fw-bold">
+        <tr>
+          <th style="width: 25%;">Categoría del Formulario</th>
+          <th style="width: 40%;">Indicador</th>
+          <th style="width: 35%;">Información Recabada</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td rowspan="3" class="fw-bold bg-white text-uppercase" style="color: #6a1b31;">Paso 1: Conteo General</td>
+          <td>En Operación</td>
+          <td class="text-center">
+            <span *ngIf="!modoEdicion" class="fw-bold">{{ datos.operativas || 0 }}</span>
+            <input *ngIf="modoEdicion" type="number" class="form-control form-control-sm text-center mx-auto w-50" [(ngModel)]="datos.operativas">
+          </td>
+        </tr>
+        <tr>
+          <td>En Reparación</td>
+          <td class="text-center">
+            <span *ngIf="!modoEdicion">{{ datos.reparacion || 0 }}</span>
+            <input *ngIf="modoEdicion" type="number" class="form-control form-control-sm text-center mx-auto w-50" [(ngModel)]="datos.reparacion">
+          </td>
+        </tr>
+        <tr>
+          <td>Guardadas / Reserva</td>
+          <td class="text-center">
+            <span *ngIf="!modoEdicion">{{ datos.reserva || 0 }}</span>
+            <input *ngIf="modoEdicion" type="number" class="form-control form-control-sm text-center mx-auto w-50" [(ngModel)]="datos.reserva">
+          </td>
+        </tr>
+
+        <tr>
+          <td rowspan="3" class="fw-bold bg-white text-uppercase" style="color: #6a1b31;">Paso 2: Conectividad a Internet</td>
+          <td>Educativo</td>
+          <td class="text-center">
+            <span *ngIf="!modoEdicion">Total: <strong>{{ datos.uso_educativo || 0 }}</strong> | Con Red: <strong>{{ datos.internet_educativo || 0 }}</strong></span>
+          </td>
+        </tr>
+        <tr>
+          <td>Docente</td>
+          <td class="text-center">
+            <span *ngIf="!modoEdicion">Total: <strong>{{ datos.uso_docente || 0 }}</strong> | Con Red: <strong>{{ datos.internet_docente || 0 }}</strong></span>
+          </td>
+        </tr>
+        <tr>
+          <td>Administrativo</td>
+          <td class="text-center">
+            <span *ngIf="!modoEdicion">Total: <strong>{{ datos.uso_administrativo || 0 }}</strong> | Con Red: <strong>{{ datos.internet_administrativo || 0 }}</strong></span>
+          </td>
+        </tr>
+
+        <tr>
+          <td rowspan="5" class="fw-bold bg-white text-uppercase" style="color: #6a1b31;">Paso 3: Inventario Técnico</td>
+          <td>1. Tipo de Equipo</td>
+          <td class="p-0">
+            <ul class="list-group list-group-flush mb-0" style="font-size: 0.9rem;">
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 py-1" *ngFor="let i of datos.conteosTipo">
+                <span>{{ i.tipoComputadora?.tipo || i.tipoComputadora?.nombre || 'No especificado' }}</span>
+                <span class="badge bg-secondary rounded-pill">{{ i.cantidad }}</span>
+              </li>
+              <li class="list-group-item text-muted border-0 py-1" *ngIf="!datos.conteosTipo?.length">No registrado</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2. Memoria RAM</td>
+          <td class="p-0">
+            <ul class="list-group list-group-flush mb-0" style="font-size: 0.9rem;">
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 py-1" *ngFor="let i of datos.conteosRam">
+                <span>{{ i.memoriaRam?.capacidad || i.memoriaRam?.ram || 'No especificado' }}</span>
+                <span class="badge bg-secondary rounded-pill">{{ i.cantidad }}</span>
+              </li>
+              <li class="list-group-item text-muted border-0 py-1" *ngIf="!datos.conteosRam?.length">No registrado</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>3. Sistema Operativo</td>
+          <td class="p-0">
+            <ul class="list-group list-group-flush mb-0" style="font-size: 0.9rem;">
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 py-1" *ngFor="let i of datos.conteosSO">
+                <span>{{ i.sistemaOperativo?.nombresistema || 'No especificado' }}</span>
+                <span class="badge bg-secondary rounded-pill">{{ i.cantidad }}</span>
+              </li>
+              <li class="list-group-item text-muted border-0 py-1" *ngIf="!datos.conteosSO?.length">No registrado</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>4. Disco Duro</td>
+          <td class="p-0">
+            <ul class="list-group list-group-flush mb-0" style="font-size: 0.9rem;">
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 py-1" *ngFor="let i of datos.conteosDisco">
+                <span>{{ i.capacidadDisco?.capacidad || i.capacidadDisco?.disco || 'No especificado' }}</span>
+                <span class="badge bg-secondary rounded-pill">{{ i.cantidad }}</span>
+              </li>
+              <li class="list-group-item text-muted border-0 py-1" *ngIf="!datos.conteosDisco?.length">No registrado</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>5. Antigüedad del Equipo</td>
+          <td class="p-0">
+            <ul class="list-group list-group-flush mb-0" style="font-size: 0.9rem;">
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 py-1" *ngFor="let i of datos.conteosAntiguedad">
+                <span>{{ i.antiguedad?.antiguedad || 'No especificado' }}</span>
+                <span class="badge bg-secondary rounded-pill">{{ i.cantidad }}</span>
+              </li>
+              <li class="list-group-item text-muted border-0 py-1" *ngIf="!datos.conteosAntiguedad?.length">No registrado</li>
+            </ul>
+          </td>
+        </tr>
+
+        <tr>
+          <td rowspan="4" class="fw-bold bg-white text-uppercase" style="color: #6a1b31;">Paso 4: Conectividad e Infraestructura</td>
+          <td>1. Tipo de Adquisición</td>
+          <td class="p-0">
+            <ul class="list-group list-group-flush mb-0" style="font-size: 0.9rem;">
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 py-1" *ngFor="let i of datos.conteosAdquisicion">
+                <span>{{ i.tipoAdquisicion?.tipo || i.tipoAdquisicion?.nombre || 'No especificado' }}</span>
+                <span class="badge bg-secondary rounded-pill">{{ i.cantidad }}</span>
+              </li>
+              <li class="list-group-item text-muted border-0 py-1" *ngIf="!datos.conteosAdquisicion?.length">No registrado</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2. Conectividad de Red Local</td>
+          <td>
+            <div class="mb-1">Conectadas a LAN con Internet: <strong class="float-end">{{ datos.computadorasConInternet || 0 }}</strong></div>
+            <div>Sin Acceso a Internet: <strong class="float-end">{{ datos.computadorasSinInternet || 0 }}</strong></div>
+          </td>
+        </tr>
+        <tr>
+          <td>3. Medio de Conexión a Internet</td>
+          <td class="text-center p-2">
+            <ng-container *ngIf="!modoEdicion">
+              <span *ngFor="let m of datos.mediosConexionSeleccionados" class="badge bg-dark me-1 fw-normal">{{ m.medio || m.nombre }}</span>
+            </ng-container>
+          </td>
+        </tr>
+        <tr>
+          <td>4. Velocidad de Conexión</td>
+          <td class="text-center p-2">
+            <ng-container *ngIf="!modoEdicion">
+              <span *ngFor="let v of datos.velocidadesInternetSeleccionadas" class="badge bg-dark me-1 fw-normal">{{ v.rango || v.velocidad }}</span>
+            </ng-container>
+          </td>
+        </tr>
+
+        <tr>
+          <td rowspan="3" class="fw-bold bg-white text-uppercase" style="color: #6a1b31;">Paso 5: Servicios y Periféricos</td>
+          <td>1. Impresoras</td>
+          <td>
+            <div class="mb-1">¿Tiene impresora disponible? <strong class="float-end">{{ datos.tiene_impresora_estudiantes ? 'Sí' : 'No' }}</strong></div>
+            <div *ngIf="datos.tiene_impresora_estudiantes">¿Las impresiones son gratuitas? <strong class="float-end">{{ datos.impresiones_gratuitas ? 'Sí' : 'No' }}</strong></div>
+          </td>
+        </tr>
+        <tr>
+          <td>2. Wi-Fi Público</td>
+          <td>
+            <div>¿Cuenta con Wi-Fi en áreas públicas? <strong class="float-end">{{ datos.tiene_wifi_publico ? 'Sí' : 'No' }}</strong></div>
+          </td>
+        </tr>
+        <tr>
+          <td>3. Servidores</td>
+          <td>
+            <div class="mb-1">¿La unidad académica tiene servidores propios? <strong class="float-end">{{ datos.tiene_servidores ? 'Sí' : 'No' }}</strong></div>
+            <div *ngIf="datos.tiene_servidores">Cantidad de Servidores: <strong class="float-end">{{ datos.cantidad_servidores || 0 }}</strong></div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-end mt-4 pt-3 border-top d-print-none">
+    <button class="btn text-white px-4 py-2" style="background-color: #6a1b31;" (click)="finalizar()" *ngIf="!modoEdicion">
+      Finalizar y Salir
+    </button>
+  </div>
+
+  <div class="row mt-5 pt-5 d-none d-print-flex text-center">
+    <div class="col-6">
+      <hr style="border-color: #000; width: 80%; margin: 0 auto 10px auto;">
+      <p class="mb-0 fw-bold">Responsable del Departamento</p>
+      <p class="text-muted" style="font-size: 12px;">Nombre y Firma</p>
+    </div>
+    <div class="col-6">
+      <hr style="border-color: #000; width: 80%; margin: 0 auto 10px auto;">
+      <p class="mb-0 fw-bold">Sello Institucional</p>
+      <p class="text-muted" style="font-size: 12px;">Fecha de impresión: {{ fechaImpresion | date:'dd/MM/yyyy' }}</p>
+    </div>
+  </div>
+
+</div>

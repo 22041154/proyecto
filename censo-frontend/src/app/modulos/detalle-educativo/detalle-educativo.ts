@@ -55,7 +55,7 @@ export class DetalleEducativoComponent implements OnInit {
 
   guardar() {
     if (!this.idActual) {
-        alert('Error: No se encontró el ID del censo actual.');
+        alert('Error: No se encontró el ID del censo actual. Regresa al inicio.');
         return;
     }
 
@@ -69,14 +69,13 @@ export class DetalleEducativoComponent implements OnInit {
     
     if (this.totales.ram !== base || this.totales.so !== base || 
         this.totales.discos !== base || this.totales.antiguedades !== base) {
-        alert(`ERROR DE COHERENCIA:\n
-              Reportaste ${base} computadoras en total, pero la suma de RAM, Discos o Antigüedad no coincide.`);
+        alert(`ERROR DE COHERENCIA:\nReportaste ${base} computadoras en total, pero la suma de RAM, Discos o Antigüedad no coincide.`);
         return;
     }
 
-    // El Payload debe estructurarse para que el backend reconozca que es una ACTUALIZACIÓN
+    // El Payload estructura las relaciones OneToMany exactas que espera NestJS
     const payload = {
-      iddatos: Number(this.idActual), // Asegúrate de incluir el ID principal aquí
+      iddatos: Number(this.idActual),
       conteosTipo: this.catalogos.tipos.filter((i:any)=>i.cantidad>0).map((i:any) => ({
           tipoComputadora: { idtipocomputadora: i.idtipocomputadora }, 
           cantidad: i.cantidad
@@ -99,19 +98,18 @@ export class DetalleEducativoComponent implements OnInit {
       }))
     };
 
-    console.log('Enviando datos al servidor...');
+    console.log('Enviando conteos de hardware al servidor...', payload);
 
-    // Usa el método de actualizar que ya tienes definido
     this.censoService.actualizarDatos(this.idActual, payload).subscribe({
       next: () => {
-        console.log('Guardado exitoso. Navegando...');
+        console.log('Catálogos guardados con éxito.');
         this.router.navigate(['/conectividad']); 
       },
       error: (e) => {
         console.error('Error detallado del servidor:', e);
-        // Esto te dirá exactamente qué campo está fallando en la base de datos
         const errorMessage = e?.error?.message || 'Error de integridad en la base de datos.';
         alert(`Error al guardar: ${errorMessage}`);
       }
     });
-}}
+  }
+}

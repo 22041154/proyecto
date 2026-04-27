@@ -29,8 +29,7 @@ export class Inicio implements OnInit {
   departamentoInicialGuardado: string = '';
   departamentoBloqueado: boolean = false;
   tempDepartamento: string | null = null;
-  departamentos: string[] = [];
-
+  departamentos: any[] = [];
   ngOnInit() {
     this.verificarRole(); // Comprobar si es admin para el botón del CMS
     this.cargarDepartamentosDisponibles();
@@ -54,35 +53,8 @@ export class Inicio implements OnInit {
 
   cargarDepartamentosDisponibles() {
   this.censoService.obtenerDepartamentosDisponibles().subscribe({
-    next: (departamentos) => {
-      this.departamentos = departamentos;
-    },
-    error: (err) => {
-      console.error('Error obteniendo departamentos disponibles', err);
-      this.departamentos = [
-        '-- Departamentos Académicos --',
-        'Sistemas y Computación',
-        'Ciencias Económico-Administrativo',
-        'Metal-Mecánica',
-        'Química-Bioquímica',
-        'Ciencias Básicas',
-        'Ciencias de la Tierra',
-        'Eléctrica Electrónica',
-        'Ingeniería Industrial',
-        '-- Departamentos Administrativos --',
-        'Centro de Computo',
-        'Recursos Financieros',
-        'Recursos Humanos',
-        'Recursos Materiales y Servicios',
-        'Mantenimiento y Equipo',
-        '-- Departamentos de Planeación y Vinculación --',
-        'Departamento de Comunicación y Difusión',
-        'Departamento de Gestión Tecnológica y Vinculación',
-        'Departamento de Servicios Escolares',
-        'Departamento de Planeación, Programación y Presupuestación',
-        'Centro de Información',
-        'Departamento de Actividades Extraescolares'
-      ];
+    next: (departamentos: any) => {  // <--- El ": any" es clave aquí
+      this.departamentos = departamentos.data || departamentos;
     }
   });
 }

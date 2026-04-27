@@ -73,12 +73,16 @@ export class ConexionInternetComponent implements OnInit {
   }
 
   guardar() {
-    if (!this.idActual) return;
+    // Si no hay ID, significa que se saltaron el Paso 1
+    if (!this.idActual) {
+      alert('Error: No se encontró el progreso del censo. Por favor, regresa al Paso 1.');
+      return;
+    }
 
     // 1. Reiniciamos el estado de errores
     Object.keys(this.errores).forEach(key => this.errores[key] = false);
 
-    // 2. Validamos campos vacíos (null o undefined)
+    // 2. Validamos campos vacíos
     let tieneErrores = false;
     Object.keys(this.datos).forEach(key => {
       if (this.datos[key] === null || this.datos[key] === undefined) {
@@ -87,17 +91,18 @@ export class ConexionInternetComponent implements OnInit {
       }
     });
 
-    // Si hay errores, no avanzamos. Los mensajes aparecerán en el HTML.
     if (tieneErrores) {
+      alert('Por favor, llena todos los campos antes de continuar.');
       return; 
     }
 
     // 3. Validación de lógica de negocio
     if ((this.datos.internet_educativo || 0) > (this.datos.uso_educativo || 0)) {
-      alert('Error: No puedes tener más equipos con internet que equipos totales.');
+      alert('Error: No puedes tener más equipos con internet que equipos totales en el área educativa.');
       return;
     }
 
+    // 4. Preparamos el paquete de datos
     const datosParaEnviar = {
       uso_educativo: this.datos.uso_educativo || 0,
       uso_docente: this.datos.uso_docente || 0,
@@ -109,8 +114,12 @@ export class ConexionInternetComponent implements OnInit {
       total_internet: this.totalInternet
     };
 
+    console.log('Enviando actualización a NestJS:', datosParaEnviar);
+
+    // 5. Llamamos al servicio de actualización (PATCH)
     this.censoService.actualizarDatos(this.idActual, datosParaEnviar).subscribe({
       next: () => {
+        // Ajusta esta ruta a donde deba ir realmente después de este paso
         this.router.navigate(['/detalle-educativo']); 
       },
       error: (e) => {

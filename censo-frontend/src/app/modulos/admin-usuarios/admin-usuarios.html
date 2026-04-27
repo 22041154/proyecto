@@ -1,49 +1,134 @@
-<div class="container mt-5 pt-5">
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white">
-      <h3 class="mb-0">Gestión de Usuarios</h3>
-    </div>
-    <div class="card-body">
-      
-      <div class="row mb-4 border-bottom pb-4">
-        <h5>Crear Nuevo Usuario</h5>
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Nombre de usuario" [(ngModel)]="nuevoUsuario.usuario">
-        </div>
-        <div class="col-md-4">
-          <input type="password" class="form-control" placeholder="Contraseña" [(ngModel)]="nuevoUsuario.contrasena">
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small fw-bold">Role:</label>
-          <select class="form-select" [(ngModel)]="nuevoUsuario.role">
-            <option value="user">Usuario</option>
-            <option value="admin">Administrador</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <button class="btn btn-success w-100" (click)="registrar()">
-            <i class="bi bi-person-plus"></i> Agregar
-          </button>
-        </div>
-      </div>
+<nav class="navbar navbar-dark bg-dark fixed-top shadow-sm">
+  <div class="container-fluid px-3">
+    <span class="navbar-brand mb-0 h1">Panel de Control</span>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </div>
+</nav>
 
+<div class="offcanvas offcanvas-end" tabindex="-1" id="menuLateral">
+  <div class="offcanvas-header bg-dark text-white">
+    <h5 class="offcanvas-title">Navegación</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  
+  <div class="offcanvas-body d-flex flex-column">
+    
+    <div class="text-center mb-4 pb-3 border-bottom">
+      <i class="bi bi-person-circle display-4 text-secondary"></i>
+      <h5 class="mt-2 mb-0">{{ userLogueado?.usuario }}</h5>
+      <span class="badge" [ngClass]="esSuperAdmin ? 'bg-primary' : 'bg-info text-dark'">
+        {{ esSuperAdmin ? 'Super Admin' : 'Admin - ' + (userLogueado?.departamento?.nombre || 'General') }}
+      </span>
+    </div>
+
+    <div class="list-group list-group-flush mb-auto">
+      <a *ngIf="esAdmin" routerLink="/admin-usuarios" class="list-group-item list-group-item-action active" data-bs-dismiss="offcanvas">
+        <i class="bi bi-people-fill me-2"></i> Gestión de Usuarios
+      </a>
+      <a routerLink="/paso1" class="list-group-item list-group-item-action" data-bs-dismiss="offcanvas">
+        <i class="bi bi-ui-checks me-2"></i> Ir al Formulario
+      </a>
+    </div>
+
+    <div class="mt-4 border-top pt-3">
+      <button class="btn btn-outline-danger w-100" (click)="cerrarSesion()" data-bs-dismiss="offcanvas">
+        <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+      </button>
+    </div>
+    
+  </div>
+</div>
+
+<div class="container" style="margin-top: 100px;">
+  <div class="card shadow">
+    
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">Gestión de Usuarios</h3>
+      
+      <span *ngIf="!esSuperAdmin && userLogueado?.departamento" class="badge bg-light text-primary fs-6">
+        Departamento: {{ userLogueado.departamento?.nombre }}
+      </span>
+      <span *ngIf="esSuperAdmin" class="badge bg-dark text-white fs-6">
+        Global
+      </span>
+    </div>
+    
+    <div class="card-body">
+
+      <!-- FORMULARIO -->
+      <div class="row mb-4 border-bottom pb-4 align-items-end g-3">
+  <h5>Crear Nuevo Usuario</h5>
+
+  <div class="col-md-2">
+    <label class="form-label small fw-bold">Usuario:</label>
+    <input type="text" class="form-control" placeholder="Nombre" [(ngModel)]="nuevoUsuario.usuario">
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label small fw-bold">Contraseña:</label>
+    <input type="password" class="form-control" placeholder="Clave" [(ngModel)]="nuevoUsuario.contrasena">
+  </div>
+  
+  <div class="col-md-3">
+    <label class="fw-bold small mb-2">Departamento</label>
+    <select class="form-select" [(ngModel)]="nuevoUsuario.departamento_id" [disabled]="!esSuperAdmin">
+      <option [value]="null" disabled selected>Seleccione un departamento...</option>
+      <option *ngFor="let dep of departamentos" [value]="dep.id">
+        {{ dep.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <!-- ROLE MÁS PEQUEÑO -->
+  <div class="col-md-2">
+    <label class="form-label small fw-bold">Rol:</label>
+    <select class="form-select" [(ngModel)]="nuevoUsuario.role" [disabled]="!esSuperAdmin">
+      <option value="user">Usuario</option>
+      <option *ngIf="esSuperAdmin" value="admin">Administrador</option>
+    </select>
+  </div>
+
+  <!-- BOTÓN JUNTO A ROLE -->
+  <div class="col-md-2">
+    <button class="btn btn-success w-100" (click)="registrar()">
+      <i class="bi bi-person-plus"></i> Agregar
+    </button>
+  </div>
+
+</div>
+
+      <!-- TABLA -->
       <h5>Usuarios Registrados</h5>
+
       <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover align-middle">
           <thead class="table-light">
             <tr>
-              <th>ID</th>
               <th>Usuario</th>
-              <th>Role</th>
-              <th>Acciones</th>
+              <th>Departamento</th>
+              <th>Rol</th>
+              <th class="text-end">Acciones</th>
             </tr>
           </thead>
+
           <tbody>
             <tr *ngFor="let u of usuarios">
-              <td>{{ u.id }}</td>
               <td>{{ u.usuario }}</td>
-              <td><span class="badge" [ngClass]="u.role === 'admin' ? 'bg-danger' : 'bg-info'">{{ u.role }}</span></td>
+              <td><strong>{{ u.departamento?.nombre || 'N/A' }}</strong></td>
               <td>
+                <span class="badge"
+                  [ngClass]="{
+                    'bg-dark': u.role === 'superadmin',
+                    'bg-danger': u.role === 'admin',
+                    'bg-info text-dark': u.role === 'user'
+                  }">
+                  {{ u.role | uppercase }}
+                </span>
+              </td>
+              <td class="text-end">
                 <button class="btn btn-sm btn-outline-danger" (click)="eliminar(u.id)">
                   <i class="bi bi-trash"></i> Eliminar
                 </button>
@@ -53,9 +138,10 @@
         </table>
       </div>
 
-      <div *ngIf="cargando" class="text-center">
-        <div class="spinner-border text-primary" role="status"></div>
+      <div *ngIf="cargando" class="text-center mt-3">
+        <div class="spinner-border text-primary"></div>
       </div>
+
     </div>
   </div>
 </div>

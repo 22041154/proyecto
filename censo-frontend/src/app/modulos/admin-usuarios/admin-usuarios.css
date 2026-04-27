@@ -1,5 +1,121 @@
-.admin-users { padding: 16px; }
-.new-user { margin-bottom: 12px; }
-table { width: 100%; border-collapse: collapse; }
-th, td { border: 1px solid #ddd; padding: 8px; }
-th { background: #f4f4f4; }
+/* CONTENEDOR GENERAL */
+.container {
+  max-width: 1200px;
+}
+
+/* NAVBAR */
+.navbar {
+  height: 65px;
+}
+
+/* TARJETA */
+.card {
+  border-radius: 10px;
+}
+
+/* HEADER */
+.card-header {
+  padding: 15px 20px;
+  font-weight: 500;
+}
+
+/* FORMULARIO */
+.row.mb-4 {
+  gap: 10px;
+}
+
+.form-label {
+  margin-bottom: 5px;
+}
+
+.form-control,
+.form-select {
+  height: 42px;
+  border-radius: 6px;
+}
+
+/* BOTÓN */
+.btn-success {
+  height: 42px;
+  border-radius: 6px;
+}
+
+/* TABLA */
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.table thead {
+  background-color: #f7f7f7;
+}
+
+.table th {
+  font-weight: 600;
+  color: #444;
+  border-bottom: 1px solid #eee;
+}
+
+.table td {
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #fafafa;
+}
+
+/* BADGES */
+.badge {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+/* USER */
+.bg-info {
+  background-color: #e0f2f1 !important;
+  color: #00695c !important;
+}
+
+/* ADMIN */
+.bg-danger {
+  background-color: #fdecea !important;
+  color: #b71c1c !important;
+}
+
+/* SUPERADMIN */
+.bg-dark {
+  background-color: #eeeeee !important;
+  color: #333 !important;
+}
+
+/* BOTÓN ELIMINAR */
+.btn-outline-danger {
+  border-color: #ddd;
+  color: #888;
+}
+
+.btn-outline-danger:hover {
+  background-color: #f5f5f5;
+  color: #000;
+  border-color: #ccc;
+}
+
+/* MENÚ LATERAL */
+.offcanvas {
+  width: 300px !important;
+}
+
+/* PERFIL */
+.offcanvas .text-center {
+  margin-top: 10px;
+}
+
+/* LINK ACTIVO */
+.list-group-item.active {
+  background-color: #0d6efd !important;
+  color: white !important;
+}

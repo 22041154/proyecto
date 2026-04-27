@@ -11,40 +11,40 @@ import { Observable } from 'rxjs';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private baseUrl = environment.apiUrl || 'http://localhost:5203';
+  private baseUrl = environment.apiUrl || 'http://localhost:5203'; 
 
-  login(usuario: string, contrasena: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/auth/login`, { usuario, contrasena })
+  login(credenciales: { usuario: string, contrasena: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/auth/login`, credenciales)
       .pipe(
         tap(response => {
           if (response.access_token) {
-            
-            localStorage.setItem('token', response.access_token);
+            localStorage.setItem('access_token', response.access_token);
           }
         })
       );
   }
 
   logout() {
-    
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
     localStorage.removeItem('id_censo_actual'); 
     localStorage.removeItem('temp_departamento');
     this.router.navigate(['/login']);
   }
 
   obtenerUsuarioId(): number | null {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.id; 
+      // 3. En NestJS, el ID se guarda en la propiedad 'sub'
+      return payload.sub; 
     } catch (e) {
       return null;
     }
   }
+
   getUserRole(): string | null {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -61,6 +61,6 @@ export class AuthService {
   }
 
   estaLogueado(): boolean {
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem('access_token');
   }
 }

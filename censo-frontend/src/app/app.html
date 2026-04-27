@@ -1,14 +1,42 @@
-<nav *ngIf="mostrarHeader()" class="navbar navbar-dark bg-primary fixed-top shadow">
-  <div class="container-fluid">
-    <span class="navbar-brand mb-0 h1"> Anexo Tecnologías de la información</span>
-    <div class="d-flex ms-auto">
-      <button class="btn btn-outline-danger btn-sm" (click)="cerrarSesion()">
-        <i class="bi bi-box-arrow-left"></i> Salir del Formulario
-      </button>
-    </div>
+<nav *ngIf="mostrarHeader()" class="navbar navbar-dark fixed-top shadow-sm" style="background-color: #621231;">
+  <div class="container-fluid px-3 d-flex align-items-center">
+    
+    <button class="btn btn-outline-light border-0 d-flex align-items-center me-3" 
+            type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateralGlobal">
+      <i class="bi bi-list fs-2"></i>
+    </button>
+
+    <span class="navbar-brand mb-0 h5 fw-bold">Anexo Tecnologías de la información</span>
+    
   </div>
 </nav>
 
-<div class="container">
+<div class="offcanvas offcanvas-start d-print-none" tabindex="-1" id="menuLateralGlobal" style="width: 280px;">
+  <div class="offcanvas-header text-white" style="background-color: #1a237e;">
+    <h5 class="offcanvas-title fw-bold"><i class="bi bi-grid-fill me-2"></i> Menú Principal</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  
+  <div class="offcanvas-body d-flex flex-column p-0">
+    
+    <div class="list-group list-group-flush mb-auto mt-2">
+      <a *ngIf="esAdmin" routerLink="/admin-usuarios" class="list-group-item list-group-item-action menu-item" data-bs-dismiss="offcanvas">
+        <i class="bi bi-people-fill me-2"></i> Gestión de Usuarios
+      </a>
+      
+      <a (click)="continuarCenso()" style="cursor: pointer;" class="list-group-item list-group-item-action" data-bs-dismiss="offcanvas">        <i class="bi bi-ui-checks me-3"></i> Formulario 
+      </a>
+    </div>
+
+    <div class="p-3 border-top bg-light">
+      <button class="btn btn-outline-danger w-100 py-2 fw-bold" (click)="cerrarSesion()" data-bs-dismiss="offcanvas">
+        <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesión
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div class="container" style="margin-top: 85px;">
   <router-outlet></router-outlet>
 </div>

@@ -6,7 +6,7 @@ import { ConexionInternetComponent } from './modulos/informacion-general/conexio
 import { DetalleEducativoComponent } from './modulos/detalle-educativo/detalle-educativo';
 import { Conectividad } from './modulos/conectividad/conectividad';
 import { ServiciosComponent } from './modulos/servicios/servicios';
-import { Resumen } from './modulos/resumen/resumen';
+import { Resumen } from './modulos/resumen/resumen' ;
 import { AdminUsuariosComponent } from './modulos/admin-usuarios/admin-usuarios';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -20,7 +20,14 @@ export const routes: Routes = [
   { path: 'conectividad', component: Conectividad },
   { path: 'servicios', component: ServiciosComponent },
   { path: 'resumen', component: Resumen },
-  { path: 'admin-usuarios', component: AdminUsuariosComponent, canActivate: [AdminGuard] },
+  
+
+  { 
+    path: 'admin-usuarios', 
+    component: AdminUsuariosComponent,
+    canActivate: [AdminGuard]
+  },
+  
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }
 ];

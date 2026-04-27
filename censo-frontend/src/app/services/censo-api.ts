@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -31,9 +31,12 @@ export class CensoApiService {
   }
 
   registrarUsuario(datos: any) {
-    return this.http.post(`${this.baseUrl}/usuarios/registro`, datos);
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    
+    // Pasamos los headers como tercer parámetro
+    return this.http.post('http://localhost:5203/usuarios/registrar', datos, { headers });
   }
-
   eliminarUsuario(id: number) {
     return this.http.delete(`${this.baseUrl}/usuarios/${id}`);
   }
@@ -87,7 +90,11 @@ export class CensoApiService {
     );
   }
 
-  obtenerDepartamentosDisponibles(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.baseUrl}/datos-escuela/disponibles/departamentos`);
+  obtenerDepartamentosDisponibles() {
+
+    return this.http.get('http://localhost:5203/departamentos'); 
   }
+  obtenerDepartamentos(): Observable<string[]> {
+  return this.http.get<string[]>(`${this.baseUrl}/datos-escuela/disponibles/departamentos`);
+}
 }
