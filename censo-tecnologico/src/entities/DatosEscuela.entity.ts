@@ -9,6 +9,7 @@ import { ConteoAdquisicion } from './conteo-adquisicion.entity';
 import { MedioConexion } from './medio-conexion.entity';
 import { VelocidadInternet } from './velocidad-internet.entity';
 import { PerfilWifi } from './perfil-wifi.entity'; 
+import { Departamento } from './departamento.entity';
 
 @Entity({ name: 'datos_escuela' })
 export class DatosEscuela {
@@ -47,10 +48,6 @@ export class DatosEscuela {
 
   @Column('int', { nullable: true })
   total_internet: number;
-
-  
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  departamento: string;
 
   @Column({ 
     type: 'enum', 
@@ -123,4 +120,9 @@ export class DatosEscuela {
 
   @Column({ nullable: true })
   usuarioId: number;
+
+  @ManyToOne(() => Departamento, { eager: true })
+  @JoinColumn({ name: 'departamento_id' })
+  departamento: Departamento;
+  
 }

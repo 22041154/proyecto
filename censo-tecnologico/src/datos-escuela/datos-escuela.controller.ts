@@ -3,18 +3,21 @@ import { AuthGuard } from '@nestjs/passport';
 import { DatosEscuelaService } from './datos-escuela.service';
 
 @Controller('datos-escuela')
-//@UseGuards(AuthGuard('jwt')) 
+@UseGuards(AuthGuard('jwt')) 
 export class DatosEscuelaController {
-  constructor(private service: DatosEscuelaService) {}
+  constructor(private readonly service: DatosEscuelaService) {}
 
   @Post() 
-  async save(@Body() body: any, @Req() req: any) {
-    return await this.service.guardar(body, req.user.userId);
+  async guardarDatosEscuela(@Body() body: any, @Req() req: any) {
+    const departamentoId = req.user.departamento_id;
+    return await this.service.guardar(body, departamentoId);
   }
 
-  @Get('mi-progreso') 
-  async getProgreso(@Req() req: any) {
-    return await this.service.buscarPorUsuario(req.user.userId);
+  @Get('mi-progreso')
+  async obtenerMiProgreso(@Req() req: any) {
+    const idDepartamento = req.user.departamento_id;
+    const progreso = await this.service.buscarPorDepartamento(idDepartamento);
+    return progreso || null;
   }
 
   @Get('disponibles/departamentos')

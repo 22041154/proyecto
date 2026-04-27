@@ -1,22 +1,27 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { UsuariosService } from 'src/usuarios/usuarios.service';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly usuariosService: UsuariosService) {
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'CLAVE_SECRETA_PARA_FIRMAR_TOKENS',
+      secretOrKey: 'CLAVE_SECRETA_PARA_FIRMAR_TOKENS', // (Asegúrate de que sea el mismo de tu AuthModule)
     });
   }
 
+  // ESTA ES LA FUNCIÓN CRÍTICA
   async validate(payload: any) {
-    const user = await this.usuariosService.findOneById(payload.sub);
-    if (!user) return { userId: payload.sub, username: payload.username };
-    const { contrasena, ...rest } = user as any;
-    return { userId: rest.id, username: rest.usuario, role: rest.role };
+    // Lo que devuelvas aquí, es lo que NestJS guarda en "req.user"
+    return { 
+      id: payload.sub || payload.id, 
+      usuario: payload.usuario, 
+      
+      // ¡ESTAS DOS LÍNEAS SON LAS QUE FALTABAN PARA QUE EL GUARD FUNCIONE!
+      role: payload.role, 
+      departamento_id: payload.departamento_id 
+    };
   }
 }

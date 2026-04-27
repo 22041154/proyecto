@@ -21,10 +21,12 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { 
+  
+  const payload = { 
     usuario: user.usuario, 
-    sub: user.id, 
-    role: user.role
+    role: user.role,
+    departamento_id: user.departamento ? user.departamento.id : null,
+    departamento_nombre: user.departamento ? user.departamento.nombre : 'General'
   };
 
   return {

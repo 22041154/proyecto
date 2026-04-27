@@ -43,15 +43,15 @@ import { PerfilWifiModule } from './perfil-wifi/perfil-wifi.module';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'estadisticatic', 
-      password: 'estadisticaticpass',      
-      database: 'estadisticatic',  
+      username: 'postgres', 
+      password: '1234',      
+      database: 'CensoTecnologico',  
       entities: [
         Usuario, DatosEscuela, Computadoras,
         TiposComputadora, MemoriasRam, CapacidadesDisco, Antiguedades, SistemasOperativos,ConteoAdquisicion,
         ConteoMemoriaRam, ConteoSistemaOperativo, ConteoCapacidadDisco, ConteoAntiguedad, ConteoTipoComputadora
       ],
-      synchronize: false,
+      synchronize: true,
       autoLoadEntities: true,
     }),
 

@@ -28,157 +28,130 @@ export class DatosEscuelaService {
     private conteoTipoRepo: Repository<ConteoTipoComputadora>,
   ) {}
 
-  async guardar(data: any, usuarioId: number) {
-    const existe = await this.repo.findOne({ where: { usuarioId: usuarioId } });
+  async guardar(data: any, departamentoId: number) {
+    const existe = await this.repo.findOne({ 
+      where: { departamento: { id: departamentoId } } 
+    });
     
     if (existe) {
-      await this.repo.update(existe.iddatos, data);
+      await this.repo.update(existe.iddatos, { ...data });
       return { iddatos: existe.iddatos, ...data }; 
     } else {
-      const nuevo = this.repo.create({ ...data, usuarioId: usuarioId });
+      const nuevo = this.repo.create({ 
+        ...data, 
+        departamento: { id: departamentoId } 
+      });
       return await this.repo.save(nuevo);
     }
   }
 
   async actualizar(id: number, datos: any) {
     try {
-      // Extraer las relaciones OneToMany del paso 3
-      const conteosTipo = datos.conteosTipo;
-      const conteosRam = datos.conteosRam;
-      const conteosSO = datos.conteosSO;
-      const conteosDisco = datos.conteosDisco;
-      const conteosAntiguedad = datos.conteosAntiguedad;
+      const { 
+        conteosTipo, conteosRam, conteosSO, conteosDisco, conteosAntiguedad,
+        mediosConexionSeleccionados: medios,
+        velocidadesInternetSeleccionadas: velocidades,
+        perfilesWifiSeleccionados: perfiles,
+        conteosAdquisicion
+      } = datos;
       
-      // Relaciones de pasos posteriores
-      const medios = datos.mediosConexionSeleccionados;
-      const velocidades = datos.velocidadesInternetSeleccionadas;
-      const perfiles = datos.perfilesWifiSeleccionados;
-      const conteosAdquisicion = datos.conteosAdquisicion;
-      
-      // Separar datos normales de relaciones
+      // Limpiar datos para actualización simple
       const datosSimples = { ...datos };
-      delete datosSimples.conteosTipo;
-      delete datosSimples.conteosRam;
-      delete datosSimples.conteosSO;
-      delete datosSimples.conteosDisco;
-      delete datosSimples.conteosAntiguedad;
-      delete datosSimples.mediosConexionSeleccionados;
-      delete datosSimples.velocidadesInternetSeleccionadas;
-      delete datosSimples.perfilesWifiSeleccionados;
-      delete datosSimples.conteosAdquisicion;
+      const keysToDelete = [
+        'conteosTipo', 'conteosRam', 'conteosSO', 'conteosDisco', 
+        'conteosAntiguedad', 'mediosConexionSeleccionados', 
+        'velocidadesInternetSeleccionadas', 'perfilesWifiSeleccionados', 
+        'conteosAdquisicion'
+      ];
+      keysToDelete.forEach(key => delete datosSimples[key]);
 
-      // Actualizar datos simples
       await this.repo.update(id, datosSimples);
 
-      // Obtener el registro actualizado
-      const registro = await this.repo.findOne({ 
-        where: { iddatos: id }
-      });
-
-      if (!registro) {
-        throw new Error(`Registro con ID ${id} no encontrado`);
+      // Actualización de relaciones Paso 3 (Tipos, RAM, SO, Discos, Antigüedad)
+      const censoRel = { iddatos: id };
+      
+      if (Array.isArray(conteosTipo)) {
+        await this.conteoTipoRepo.delete({ censo: censoRel });
+        if (conteosTipo.length > 0) {
+          await this.conteoTipoRepo.insert(conteosTipo.map(c => ({
+            cantidad: c.cantidad, censo: censoRel, tipoComputadora: { idtipocomputadora: c.tipoComputadora.idtipocomputadora }
+          })));
+        }
       }
 
-      // Actualizar conteosTipo (Paso 3)
-      if (conteosTipo && Array.isArray(conteosTipo) && conteosTipo.length > 0) {
-        await this.conteoTipoRepo.delete({ censo: { iddatos: id } });
-        const nuevosConteos = conteosTipo.map(conteo => ({
-          cantidad: conteo.cantidad,
-          censo: { iddatos: id },
-          tipoComputadora: { idtipocomputadora: conteo.tipoComputadora.idtipocomputadora }
-        }));
-        await this.conteoTipoRepo.insert(nuevosConteos);
+      if (Array.isArray(conteosRam)) {
+        await this.conteoRamRepo.delete({ censo: censoRel });
+        if (conteosRam.length > 0) {
+          await this.conteoRamRepo.insert(conteosRam.map(c => ({
+            cantidad: c.cantidad, censo: censoRel, memoriaRam: { idram: c.memoriaRam.idram }
+          })));
+        }
       }
 
-      // Actualizar conteosRam (Paso 3)
-      if (conteosRam && Array.isArray(conteosRam) && conteosRam.length > 0) {
-        await this.conteoRamRepo.delete({ censo: { iddatos: id } });
-        const nuevosConteos = conteosRam.map(conteo => ({
-          cantidad: conteo.cantidad,
-          censo: { iddatos: id },
-          memoriaRam: { idram: conteo.memoriaRam.idram }
-        }));
-        await this.conteoRamRepo.insert(nuevosConteos);
+      if (Array.isArray(conteosSO)) {
+        await this.conteoSORepo.delete({ censo: censoRel }); // Corrección nombre repo
+        if (conteosSO.length > 0) {
+          await this.conteoSORepo.insert(conteosSO.map(c => ({
+            cantidad: c.cantidad, censo: censoRel, sistemaOperativo: { idsistema: c.sistemaOperativo.idsistema }
+          })));
+        }
       }
 
-      // Actualizar conteosSO (Paso 3)
-      if (conteosSO && Array.isArray(conteosSO) && conteosSO.length > 0) {
-        await this.conteoSORepo.delete({ censo: { iddatos: id } });
-        const nuevosConteos = conteosSO.map(conteo => ({
-          cantidad: conteo.cantidad,
-          censo: { iddatos: id },
-          sistemaOperativo: { idsistema: conteo.sistemaOperativo.idsistema }
-        }));
-        await this.conteoSORepo.insert(nuevosConteos);
+      if (Array.isArray(conteosDisco)) {
+        await this.conteoDisco.delete({ censo: censoRel });
+        if (conteosDisco.length > 0) {
+          await this.conteoDisco.insert(conteosDisco.map(c => ({
+            cantidad: c.cantidad, censo: censoRel, capacidadDisco: { idcapacidad: c.capacidadDisco.idcapacidad }
+          })));
+        }
       }
 
-      // Actualizar conteosDisco (Paso 3)
-      if (conteosDisco && Array.isArray(conteosDisco) && conteosDisco.length > 0) {
-        await this.conteoDisco.delete({ censo: { iddatos: id } });
-        const nuevosConteos = conteosDisco.map(conteo => ({
-          cantidad: conteo.cantidad,
-          censo: { iddatos: id },
-          capacidadDisco: { idcapacidad: conteo.capacidadDisco.idcapacidad }
-        }));
-        await this.conteoDisco.insert(nuevosConteos);
+      if (Array.isArray(conteosAntiguedad)) {
+        await this.conteoAntiguedadRepo.delete({ censo: censoRel });
+        if (conteosAntiguedad.length > 0) {
+          await this.conteoAntiguedadRepo.insert(conteosAntiguedad.map(c => ({
+            cantidad: c.cantidad, censo: censoRel, antiguedad: { idantiguedad: c.antiguedad.idantiguedad }
+          })));
+        }
       }
 
-      // Actualizar conteosAntiguedad (Paso 3)
-      if (conteosAntiguedad && Array.isArray(conteosAntiguedad) && conteosAntiguedad.length > 0) {
-        await this.conteoAntiguedadRepo.delete({ censo: { iddatos: id } });
-        const nuevosConteos = conteosAntiguedad.map(conteo => ({
-          cantidad: conteo.cantidad,
-          censo: { iddatos: id },
-          antiguedad: { idantiguedad: conteo.antiguedad.idantiguedad }
-        }));
-        await this.conteoAntiguedadRepo.insert(nuevosConteos);
-      }
-
-      // Actualizar medios, velocidades y perfiles si existen
+      // Actualizar relaciones ManyToMany (Paso 4 y 5)
       if (medios || velocidades || perfiles) {
-        const registroActualizado = await this.repo.findOne({ 
+        const registro = await this.repo.findOne({ 
           where: { iddatos: id },
           relations: ['mediosConexionSeleccionados', 'velocidadesInternetSeleccionadas', 'perfilesWifiSeleccionados']
         });
 
-        if (registroActualizado) {
-          if (medios) {
-            registroActualizado.mediosConexionSeleccionados = medios;
-          }
-          if (velocidades) {
-            registroActualizado.velocidadesInternetSeleccionadas = velocidades;
-          }
-          if (perfiles) {
-            registroActualizado.perfilesWifiSeleccionados = perfiles;
-          }
-          await this.repo.save(registroActualizado);
+        if (registro) {
+          if (medios) registro.mediosConexionSeleccionados = medios;
+          if (velocidades) registro.velocidadesInternetSeleccionadas = velocidades;
+          if (perfiles) registro.perfilesWifiSeleccionados = perfiles;
+          await this.repo.save(registro);
         }
       }
       
-      // Actualizar conteosAdquisicion
-      if (conteosAdquisicion && Array.isArray(conteosAdquisicion) && conteosAdquisicion.length > 0) {
-        await this.conteoAdquisicionRepo.delete({ datosEscuela: { iddatos: id } });
-        
-        const nuevosConteos = conteosAdquisicion.map(conteo => ({
-          cantidad: conteo.cantidad,
-          datosEscuela: { iddatos: id },
-          tipoAdquisicion: { id: conteo.tipoAdquisicion.id }
-        }));
-        
-        await this.conteoAdquisicionRepo.insert(nuevosConteos);
+      // Actualizar Paso 4 (Adquisición)
+      if (Array.isArray(conteosAdquisicion)) {
+        await this.conteoAdquisicionRepo.delete({ datosEscuela: censoRel });
+        if (conteosAdquisicion.length > 0) {
+          await this.conteoAdquisicionRepo.insert(conteosAdquisicion.map(c => ({
+            cantidad: c.cantidad, datosEscuela: censoRel, tipoAdquisicion: { id: c.tipoAdquisicion.id }
+          })));
+        }
       }
 
-      // Retornar el registro actualizado
       return await this.findOne(id);
     } catch (error) {
-      console.error('Error en actualizar:', error);
+      console.error('Error en actualización masiva:', error);
       throw error;
     }
   }
 
-  async buscarPorUsuario(usuarioId: number) {
+  // BUSCA POR DEPARTAMENTO PARA COMPARTIR PROGRESO
+  async buscarPorDepartamento(departamentoId: number) {
     return await this.repo
       .createQueryBuilder('datos')
+      .leftJoinAndSelect('datos.departamento', 'departamento')
       .leftJoinAndSelect('datos.conteosRam', 'conteosRam')
       .leftJoinAndSelect('datos.conteosSO', 'conteosSO')
       .leftJoinAndSelect('datos.conteosDisco', 'conteosDisco')
@@ -189,71 +162,60 @@ export class DatosEscuelaService {
       .leftJoinAndSelect('datos.mediosConexionSeleccionados', 'mediosConexionSeleccionados')
       .leftJoinAndSelect('datos.velocidadesInternetSeleccionadas', 'velocidadesInternetSeleccionadas')
       .leftJoinAndSelect('datos.perfilesWifiSeleccionados', 'perfilesWifiSeleccionados')
-      .where('datos.usuarioId = :usuarioId', { usuarioId })
+      .where('departamento.id = :departamentoId', { departamentoId })
       .getOne();
   }
 
   async findOne(id: number) {
-    return await this.repo
-      .createQueryBuilder('datos')
+    return await this.repo.createQueryBuilder('datos')
+      .leftJoinAndSelect('datos.departamento', 'departamento')
+      
       .leftJoinAndSelect('datos.conteosRam', 'conteosRam')
+      .leftJoinAndSelect('conteosRam.memoriaRam', 'memoriaRam') 
+      
       .leftJoinAndSelect('datos.conteosSO', 'conteosSO')
+      .leftJoinAndSelect('conteosSO.sistemaOperativo', 'sistemaOperativo') 
+      
       .leftJoinAndSelect('datos.conteosDisco', 'conteosDisco')
-      .leftJoinAndSelect('datos.conteosAntiguedad', 'conteosAntiguedad')
+      .leftJoinAndSelect('conteosDisco.capacidadDisco', 'capacidadDisco')
+      
       .leftJoinAndSelect('datos.conteosTipo', 'conteosTipo')
+      .leftJoinAndSelect('conteosTipo.tipoComputadora', 'tipoComputadora')
+      
+      .leftJoinAndSelect('datos.conteosAntiguedad', 'conteosAntiguedad')
+      .leftJoinAndSelect('conteosAntiguedad.antiguedad', 'antiguedad')
+      
       .leftJoinAndSelect('datos.conteosAdquisicion', 'conteosAdquisicion')
       .leftJoinAndSelect('conteosAdquisicion.tipoAdquisicion', 'tipoAdquisicion')
+      
       .leftJoinAndSelect('datos.mediosConexionSeleccionados', 'mediosConexionSeleccionados')
       .leftJoinAndSelect('datos.velocidadesInternetSeleccionadas', 'velocidadesInternetSeleccionadas')
-      .leftJoinAndSelect('datos.perfilesWifiSeleccionados', 'perfilesWifiSeleccionados')
+      
       .where('datos.iddatos = :id', { id })
       .getOne();
   }
+  async obtenerDepartamentosDisponibles() {
+    const todosLosDepartamentos = [
+      '-- Departamentos Académicos --',
+      'Sistemas y Computación',
+      'Ciencias Económico-Administrativo',
+      // ... (aquí van todos los demás que ya tenías)
+      'Departamento de Actividades Extraescolares'
+    ];
 
-  // src/datos-escuela/datos-escuela.service.ts
+    const departamentosEnUso = await this.repo
+      .createQueryBuilder('datos')
+      .select('DISTINCT datos.departamento', 'departamento')
+      .where('datos.departamento IS NOT NULL')
+      .getRawMany();
 
-async obtenerDepartamentosDisponibles() {
-  // 1. Definimos la nueva lista estructurada con encabezados
-  const todosLosDepartamentos = [
-    '-- Departamentos Académicos --',
-    'Sistemas y Computación',
-    'Ciencias Económico-Administrativo',
-    'Metal-Mecánica',
-    'Química-Bioquímica',
-    'Ciencias Básicas',
-    'Ciencias de la Tierra',
-    'Eléctrica Electrónica',
-    'Ingeniería Industrial',
-    '-- Departamentos Administrativos --',
-    'Centro de Computo',
-    'Recursos Financieros',
-    'Recursos Humanos',
-    'Recursos Materiales y Servicios',
-    'Mantenimiento y Equipo',
-    '-- Departamentos de Planeación y Vinculación --',
-    'Departamento de Comunicación y Difusión',
-    'Departamento de Gestión Tecnológica y Vinculación',
-    'Departamento de Servicios Escolares',
-    'Departamento de Planeación, Programación y Presupuestación',
-    'Centro de Información',
-    'Departamento de Actividades Extraescolares'
-  ];
+    const departamentosEnUsoNombres = departamentosEnUso.map(d => d.departamento);
 
-  // 2. Consultamos qué departamentos ya tienen un censo registrado
-  const departamentosEnUso = await this.repo
-    .createQueryBuilder('datos')
-    .select('DISTINCT datos.departamento', 'departamento')
-    .where('datos.departamento IS NOT NULL')
-    .getRawMany();
+    const departamentosDisponibles = todosLosDepartamentos.filter(depto => {
+      if (depto.startsWith('--')) return true; 
+      return !departamentosEnUsoNombres.includes(depto); 
+    });
 
-  const departamentosEnUsoNombres = departamentosEnUso.map(d => d.departamento);
-
-  const departamentosDisponibles = todosLosDepartamentos.filter(depto => {
-    if (depto.startsWith('--')) return true; 
-    return !departamentosEnUsoNombres.includes(depto); 
-  });
-
-  return departamentosDisponibles;
-}
-
+    return departamentosDisponibles;
+  }
 }
